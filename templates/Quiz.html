@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        :root {
+            /* Following a minimal color palette */
+            --background: #ffffff;
+            --surface: #fafafa;
+            --primary: #77699e;
+            --text: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #e0e0e0;
+            --hover: #f5f5f5;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --focus-ring: 0 0 0 2px rgba(119, 105, 158, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7e0ff;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        /* Fitts's Law: Making interactive elements larger and easier to click */
+        .flashcard-container {
+            width: 100%;
+            max-width: 960px; /* Increased from 640px while maintaining readability */
+            margin: 0 auto;
+            padding: 2.5rem; /* Increased padding to maintain visual hierarchy */
+            background: var(--background);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        /* Miller's Law: Grouping related elements */
+        .topic-selection {
+            margin-bottom: 3rem;
+            max-width: 800px; /* Added max-width for better form control positioning */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .topic-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* Jakob's Law: Following familiar patterns */
+        #topicSelect {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            color: var(--text);
+            background-color: var(--background);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            appearance: none;
+        }
+        
+        #topicSelect:hover {
+            border-color: var(--primary);
+        }
+        
+        #topicSelect:focus {
+            outline: none;
+            box-shadow: var(--focus-ring);
+            border-color: var(--primary);
+        }
+        
+        /* Law of Proximity: Spacing elements appropriately */
+        .question {
+            font-size: 1.5rem; /* Increased for better readability in wider container */
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2.5rem;
+            line-height: 1.4;
+            max-width: 800px; /* Added max-width for optimal line length */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Law of Common Region: Visual grouping */
+        .progress {
+            height: 6px; /* Increased for better visibility in wider container */
+            background-color: var(--border);
+            border-radius: 3px;
+            margin: 2.5rem 0;
+            overflow: hidden;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        /* Von Restorff Effect: Making selected items distinct */
+        .options {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Added grid for better space utilization */
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .option {
+            padding: 1.25rem 1.5rem; /* Increased padding for better touch targets */
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem; /* Increased for better readability */
+            color: var(--text);
+        }
+        
+        .option:hover {
+            background-color: var(--hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        
+        .option:focus {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        
+        .option.correct {
+            background-color: #f0f7f0;
+            border-color: #4caf50;
+            color: #1b5e20;
+        }
+        
+        .option.incorrect {
+            background-color: #fdf1f1;
+            border-color: #ef5350;
+            color: #c62828;
+        }
+        
+        /* Law of Prägnanz: Clear and simple feedback */
+        .feedback {
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+            margin-bottom: 2.5rem;
+            background-color: var(--surface);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Law of Uniform Connectedness: Consistent navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.25rem;
+            margin-top: 2.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem; /* Increased padding for better touch targets */
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--background);
+            color: var(--text);
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .btn:focus {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+        
+            .flashcard-container {
+                padding: 1.5rem;
+            }
+        
+            .options {
+                grid-template-columns: 1fr; /* Stack options on smaller screens */
+            }
+        
+            .btn {
+                padding: 0.75rem 1.25rem;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="flashcard-container">
+        <div class="topic-selection">
+            <label class="topic-label" for="topicSelect">Select Topic</label>
+            <select id="topicSelect" onchange="changeTopic()">
+                <!-- Topics will be populated here -->
+            </select>
+        </div>
+
+        <div class="question" id="question">Loading...</div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <ul class="options" id="options">
+            <!-- Options will be populated here -->
+        </ul>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="navigation">
+            <button class="btn" id="prevBtn" onclick="prevQuestion()" disabled>
+                <span class="material-symbols-rounded">arrow_back</span>
+                Previous
+            </button>
+            <button class="btn" id="nextBtn" onclick="nextQuestion()">
+                Next
+                <span class="material-symbols-rounded">arrow_forward</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const flashcardData = {{ data | tojson }};
+        let currentTopic = 0;
+        let currentQuestion = 0;
+
+        const topicSelect = document.getElementById("topicSelect");
+        flashcardData.forEach((topic, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = topic.topic;
+            topicSelect.appendChild(option);
+        });
+
+        function updateProgressBar() {
+            const progressBar = document.getElementById("progressBar");
+            const totalQuestions = flashcardData[currentTopic].questions.length;
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function changeTopic() {
+            currentTopic = parseInt(topicSelect.value);
+            currentQuestion = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const questionData = flashcardData[currentTopic].questions[currentQuestion];
+            document.getElementById("question").textContent = questionData.question;
+
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = '';
+
+            questionData.options.forEach((option) => {
+                const optionElement = document.createElement("li");
+                optionElement.classList.add("option");
+                optionElement.textContent = option.text;
+                optionElement.addEventListener("click", () => handleAnswer(option, optionElement));
+                optionsContainer.appendChild(optionElement);
+            });
+
+            document.getElementById("feedback").textContent = '';
+            updateNavigation();
+            updateProgressBar();
+        }
+
+        function handleAnswer(option, optionElement) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+
+            if (option.correct) {
+                optionElement.classList.add("correct");
+                document.getElementById("feedback").textContent = `Correct! ${option.reasoning}`;
+                document.getElementById("feedback").style.backgroundColor = 'rgba(166, 154, 197, 0.3)';
+                document.getElementById("feedback").style.color = 'var(--text-primary)';
+            } else {
+                optionElement.classList.add("incorrect");
+                document.getElementById("feedback").textContent = `Incorrect. ${option.reasoning}`;
+                document.getElementById("feedback").style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+                document.getElementById("feedback").style.color = 'var(--text-primary)';
+            }
+            document.getElementById("feedback").style.opacity = '1';
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < flashcardData[currentTopic].questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function updateNavigation() {
+            document.getElementById("prevBtn").disabled = currentQuestion === 0;
+            document.getElementById("nextBtn").disabled = currentQuestion === flashcardData[currentTopic].questions.length - 1;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

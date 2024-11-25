@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics Predicted</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        body {
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f7e0ff;
+            background-image: url("https://www.transparenttextures.com/patterns/church.png");
+            color: #fff;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .card {
+            background: #77699e;
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card:hover {
+            background: rgba(0, 0, 0, 1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: rgba(40, 40, 40, 0.8);
+            margin-bottom: 2rem;
+        }
+
+        .topic-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .topic-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+        }
+
+        .topic-subtitle {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+
+        .intensity-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .intensity-option {
+            position: relative;
+            display: inline-block;
+        }
+
+        .intensity-option input[type="radio"] {
+            display: none;
+        }
+
+        .intensity-option label {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .intensity-option input[type="radio"]:checked + label {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: #fff;
+        }
+
+        .intensity-option label:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        button {
+            margin-top: 2rem;
+            padding: 12px 24px;
+            background: #a69ac5;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            rgba(40, 40, 40, 0.8);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            align-self: center;
+        }
+
+        button:hover {
+            background: rgba(0, 0, 0, 1);
+            color:#fff;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .intensity-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if content %}
+            <h1>Your Skillset</h1>
+        {% else %}
+            <h1>Topics Predicted</h1>
+        {% endif %}
+        {% for topic, times in data.time_estimates.items() %}
+            <div class="card">
+                <div class="topic-info">
+                    <h3 class="topic-title">{{ topic }}</h3>
+                    <p class="topic-subtitle">Tasks</p>
+                </div>
+                <div class="intensity-options">
+                    <div class="intensity-option">
+                        <input type="radio" id="{{ topic }}-low" name="{{ topic }}" value="low">
+                        <label for="{{ topic }}-low">Low</label>
+                    </div>
+                    <div class="intensity-option">
+                        <input type="radio" id="{{ topic }}-medium" name="{{ topic }}" value="medium">
+                        <label for="{{ topic }}-medium">Medium</label>
+                    </div>
+                    <div class="intensity-option">
+                        <input type="radio" id="{{ topic }}-high" name="{{ topic }}" value="high">
+                        <label for="{{ topic }}-high">High</label>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% if content %}
+            <form action="/generate_interview_questions" method="get">
+            <button type="submit">Continue</button>
+            </form>
+        {% else %}
+            <form action="/generate_quiz" method="get">
+            <button type="submit">Continue</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <script>
+        function updateTopics() {
+            const selectedTopics = [];
+            const radioButtons = document.querySelectorAll('input[type="radio"]:checked');
+
+            radioButtons.forEach(radio => {
+                selectedTopics.push(radio.name + '=' + radio.value);
+            });
+
+            document.getElementById('selected_topics').value = selectedTopics.join('&');
+            return true;
+        }
+    </script>
+</body>
+</html>

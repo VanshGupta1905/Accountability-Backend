@@ -58,6 +58,7 @@ def quiz_for_topic(topics,prompt):
 
 @quiz.route('/generate_quiz')
 def generating_quiz():
+    
     prompt = """
      "Given the following text, generate a set of multiple-choice questions with four options each.
       Each question should have a clear topic from the topic list, and the correct answer should be indicated. Provide a concise explanation for each correct answer. 
@@ -90,8 +91,9 @@ def generating_quiz():
     for i in range(len(topics_left) // 4):
         li = [topics_left.popleft(), topics_left.popleft(), topics_left.popleft(), topics_left.popleft()]
         quiz.extend(quiz_for_topic(li, prompt))
+        break  # Remove this
     rem = []
-    while topics_left: rem.append(topics_left.popleft())
+    # while topics_left: rem.append(topics_left.popleft())
 
     quiz.extend(quiz_for_topic(rem, prompt))
 

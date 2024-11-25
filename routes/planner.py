@@ -61,6 +61,10 @@ def Extract_text(pdf_path):
 
 @planner.route('/planner')
 def upload_form():
+    current_app.config['uploads'] = os.path.join(os.getcwd(), 'uploads')
+    if not os.path.exists(current_app.config['uploads']):
+        os.makedirs(current_app.config['uploads'])
+
     return render_template('uploadFiles.html')
 
 
@@ -79,7 +83,9 @@ def upload_file():
         global text
         filename = file.filename
         file.save(os.path.join(current_app.config['uploads'], filename))
+        
         path = os.path.join(current_app.config['uploads'], filename)
+
         text=Extract_text(path)
 
         os.remove(path)

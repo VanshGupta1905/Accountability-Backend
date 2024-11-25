@@ -14,6 +14,9 @@ app.register_blueprint(planner)
 app.register_blueprint(interview)
 UPLOAD_FOLDER = 'uploads'
 app.config['uploads'] = UPLOAD_FOLDER
+
+
+
 app.secret_key = os.getenv('SECRET_KEY')
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
